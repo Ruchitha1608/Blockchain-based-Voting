@@ -1,0 +1,270 @@
+╔══════════════════════════════════════════════════════════════════╗
+║   BLOCKCHAIN VOTING SYSTEM - WINDOWS SETUP CHECKLIST           ║
+║   Print this and check off each step as you complete it         ║
+╚══════════════════════════════════════════════════════════════════╝
+
+PREREQUISITES (Install These First)
+════════════════════════════════════
+☐ Node.js v18+              → node --version
+☐ npm                       → npm --version
+☐ Python 3.11+              → python --version (or py --version)
+☐ pip                       → pip --version
+☐ Ganache                   → ganache --version
+☐ Git                       → git --version
+☐ PowerShell or Command Prompt available
+
+INSTALLATION NOTES:
+☐ Node.js: Check "Add to PATH" during install
+☐ Python: Check "Add Python to PATH" during install
+☐ Git: Use default settings
+☐ Ganache: npm install -g ganache
+
+PROJECT FILES
+═════════════
+☐ Copy Maj folder to: C:\Users\YourName\Maj (or your preferred location)
+☐ Verify structure: dir C:\Users\YourName\Maj
+   Should see: backend\, frontend\, contracts\, database\
+
+BACKEND SETUP
+═════════════
+☐ Open PowerShell in: C:\Users\YourName\Maj\backend
+☐ python -m venv .venv (or py -m venv .venv)
+☐ .venv\Scripts\Activate.ps1
+   ☐ If error: Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+☐ Should see (.venv) in prompt
+☐ pip install -r requirements.txt (wait 2-5 mins)
+☐ copy .env.example .env
+☐ Generate secrets (run 4 times):
+   python -c "import secrets; print(secrets.token_urlsafe(64))"
+☐ Edit .env file with Notepad:
+  ☐ DATABASE_URL (Neon or local)
+  ☐ JWT_SECRET (generated above)
+  ☐ VOTING_SESSION_SECRET (generated above)
+  ☐ BIOMETRIC_SALT_PEPPER (generated above)
+  ☐ BLOCKCHAIN_PEPPER (generated above)
+☐ Verify: python -c "from app.database import Base; print('✓')"
+
+FRONTEND SETUP
+══════════════
+☐ Open NEW PowerShell in: C:\Users\YourName\Maj\frontend
+☐ npm install (wait 2-5 mins)
+☐ Create .env file:
+   echo REACT_APP_API_URL=http://localhost:8000 > .env
+
+CONTRACTS SETUP
+═══════════════
+☐ Open NEW PowerShell in: C:\Users\YourName\Maj\contracts
+☐ npm install (wait 1-2 mins)
+☐ npx truffle compile (should see "Compiled successfully")
+
+DATABASE SETUP
+══════════════
+OPTION A: Neon (Recommended for Windows)
+☐ Create account at https://neon.tech
+☐ Create project: "Voting System"
+☐ Copy connection string
+☐ Update backend\.env DATABASE_URL
+☐ Use Neon SQL Editor to run database\schema.sql
+   OR
+☐ Install psql and run: psql "YOUR_URL" -f database\schema.sql
+
+OPTION B: Local PostgreSQL
+☐ Install PostgreSQL 16 from https://postgresql.org
+☐ Open SQL Shell (psql) from Start Menu
+☐ Create database: CREATE DATABASE voting_db;
+☐ Create user: CREATE USER voting_user WITH PASSWORD 'voting_password';
+☐ Grant privileges: GRANT ALL PRIVILEGES ON DATABASE voting_db TO voting_user;
+☐ Run schema: \i 'C:/Users/YourName/Maj/database/schema.sql'
+☐ Update backend\.env DATABASE_URL
+
+CREATE ADMIN USER
+═════════════════
+☐ cd backend
+☐ .venv\Scripts\Activate.ps1
+☐ Create and run create_admin.py script OR
+☐ Insert directly in database SQL
+☐ Note credentials:
+  Username: super_admin
+  Password: Admin@123 (change this!)
+
+START SERVICES (Keep 3 PowerShell windows open)
+════════════════════════════════════════════════
+
+POWERSHELL 1: Ganache
+☐ ganache --networkId 1337 --port 8545
+☐ Should show: "Listening on 127.0.0.1:8545"
+☐ Should show: 10 accounts with private keys
+☐ Leave running ✓
+
+POWERSHELL 2: Deploy Contracts FIRST, Then Backend
+☐ Open new PowerShell
+☐ cd C:\Users\YourName\Maj\contracts
+☐ npx truffle migrate --network development
+☐ Should show 4 contract addresses
+☐ Then start backend:
+  ☐ cd C:\Users\YourName\Maj\backend
+  ☐ .venv\Scripts\Activate.ps1
+  ☐ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+  ☐ Should show: "Application startup complete"
+  ☐ Should show: "contracts_loaded"
+  ☐ Leave running ✓
+
+POWERSHELL 3: Frontend
+☐ Open new PowerShell
+☐ cd C:\Users\YourName\Maj\frontend
+☐ npm start
+☐ Browser opens to http://localhost:3000
+☐ Should see: "Compiled successfully!"
+☐ Leave running ✓
+
+VERIFICATION
+════════════
+☐ Test Ganache (PowerShell):
+  curl -X POST http://127.0.0.1:8545 `
+    -H "Content-Type: application/json" `
+    -Body '{"jsonrpc":"2.0","method":"net_version","params":[],"id":1}'
+  Result should contain: "1337"
+
+☐ Test Backend (PowerShell):
+  curl http://localhost:8000/api/health
+  Result should be: {"status":"healthy"}
+
+☐ Test Frontend:
+  Open: http://localhost:3000
+  Should see: Login page
+
+☐ Test Login:
+  Username: super_admin
+  Password: Admin@123
+  Should see: Admin Dashboard
+
+FUNCTIONAL TESTS
+════════════════
+☐ Navigate to Election Manager
+☐ Create new election
+☐ Add constituency
+☐ Add candidate
+☐ Edit election details (test Edit button)
+☐ Navigate to Voter Registration
+☐ Camera permission works
+☐ Can capture face photo
+☐ Register a test voter
+☐ Check backend logs (no errors)
+☐ Start election
+☐ Go to Polling Booth
+☐ Authenticate with face
+☐ Cast vote
+☐ Close election
+☐ Finalize election
+☐ View results (should show vote count)
+☐ Check Audit Logs
+
+ALL CHECKS PASSED? ✓
+═══════════════════════
+☐ All 3 PowerShell windows running without errors
+☐ Can login and use all features
+☐ Votes are being counted correctly
+☐ Blockchain transactions recorded
+☐ No errors in any terminal
+
+✅ SETUP COMPLETE!
+
+═══════════════════════════════════════════════════════════════════
+IMPORTANT FILES FOR YOUR FRIEND:
+═══════════════════════════════════════════════════════════════════
+
+Give them these:
+  ✓ Entire Maj\ folder (except .venv, node_modules, .env)
+  ✓ WINDOWS_SETUP_GUIDE.md (detailed Windows instructions)
+  ✓ WINDOWS_SETUP_CHECKLIST.txt (this file)
+  ✓ MANUAL_SETUP_GUIDE.md (how to use the system)
+  ✓ TROUBLESHOOTING_CHECKLIST.md (fix issues)
+
+DO NOT give them:
+  ✗ .env files (contains YOUR secrets)
+  ✗ .venv\ folder (recreate on their machine)
+  ✗ node_modules\ folders (reinstall with npm)
+  ✗ build\ folders (regenerate)
+
+Tell them to:
+  1. Install prerequisites first (Node.js, Python, Git, Ganache)
+  2. Follow WINDOWS_SETUP_GUIDE.md step by step
+  3. Create their own .env files with NEW secrets
+  4. Set up their own database (Neon recommended)
+  5. Create admin user in their database
+  6. Use this checklist to verify everything
+
+═══════════════════════════════════════════════════════════════════
+ESTIMATED TIME:
+═══════════════════════════════════════════════════════════════════
+  Prerequisites: 30-60 minutes
+  Project Setup: 15-20 minutes
+  Database Setup: 10-15 minutes
+  First Launch: 5-10 minutes
+  ─────────────────────────────
+  TOTAL: 1-2 hours
+═══════════════════════════════════════════════════════════════════
+
+SYSTEM REQUIREMENTS:
+  • OS: Windows 10 or Windows 11
+  • RAM: 8GB minimum (16GB recommended)
+  • Disk: 5GB free space
+  • CPU: Any modern processor
+  • Internet: Required for package downloads and Neon database
+
+═══════════════════════════════════════════════════════════════════
+WINDOWS-SPECIFIC TIPS:
+═══════════════════════════════════════════════════════════════════
+
+PowerShell Execution Policy:
+  If .ps1 scripts won't run:
+  Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+Virtual Environment Activation:
+  PowerShell: .venv\Scripts\Activate.ps1
+  Command Prompt: .venv\Scripts\activate.bat
+  NOT: source .venv/bin/activate (that's for Mac/Linux)
+
+File Paths:
+  • Use backslash \ in Windows commands
+  • Use forward slash / in PostgreSQL commands
+  • Use forward slash / in .env file
+
+Port Conflicts:
+  Find process: netstat -ano | findstr :8545
+  Kill process: taskkill /PID <PID> /F
+
+Firewall:
+  If services can't connect, add inbound rules for:
+  • Port 3000 (Frontend)
+  • Port 8000 (Backend)
+  • Port 8545 (Ganache)
+
+═══════════════════════════════════════════════════════════════════
+NEED HELP?
+═══════════════════════════════════════════════════════════════════
+  1. Read WINDOWS_SETUP_GUIDE.md (detailed steps)
+  2. Read TROUBLESHOOTING_CHECKLIST.md
+  3. Check PowerShell windows for errors
+  4. Verify all 3 services are running
+  5. Try restarting from "START SERVICES" section
+
+═══════════════════════════════════════════════════════════════════
+SECURITY REMINDERS:
+═══════════════════════════════════════════════════════════════════
+  ☐ Change admin password after first login
+  ☐ Never commit .env files to git
+  ☐ Generate NEW secrets (don't reuse from this machine)
+  ☐ Use different database password
+  ☐ Keep all dependencies updated
+
+═══════════════════════════════════════════════════════════════════
+
+Version: 1.0 (Windows)
+Last Updated: February 16, 2026
+Tested On: Windows 10, Windows 11
+
+ALTERNATIVE: WSL2
+If you prefer Linux environment on Windows:
+  1. Run: wsl --install
+  2. Follow SETUP_CHECKLIST.txt (Linux version) instead

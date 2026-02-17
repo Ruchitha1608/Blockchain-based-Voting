@@ -1,0 +1,219 @@
+╔══════════════════════════════════════════════════════════════════╗
+║   BLOCKCHAIN VOTING SYSTEM - NEW MACHINE SETUP CHECKLIST        ║
+║   Print this and check off each step as you complete it         ║
+╚══════════════════════════════════════════════════════════════════╝
+
+PREREQUISITES (Install These First)
+════════════════════════════════════
+☐ Homebrew (Mac/Linux)      → brew --version
+☐ Node.js v18+              → node --version
+☐ npm                       → npm --version
+☐ Python 3.11+              → python3 --version
+☐ pip3                      → pip3 --version
+☐ Ganache                   → ganache --version
+☐ Git                       → git --version
+
+PROJECT FILES
+═════════════
+☐ Copy Maj folder to: ~/Maj
+☐ Verify structure: ls ~/Maj (should see backend/, frontend/, contracts/)
+
+BACKEND SETUP
+═════════════
+☐ cd ~/Maj/backend
+☐ python3 -m venv .venv
+☐ source .venv/bin/activate (should see (.venv) in prompt)
+☐ pip install -r requirements.txt (wait 2-5 mins)
+☐ cp .env.example .env
+☐ Generate secrets: python3 -c "import secrets; print(secrets.token_urlsafe(64))"
+☐ Edit .env file:
+  ☐ DATABASE_URL (Neon or local)
+  ☐ JWT_SECRET (generated above)
+  ☐ VOTING_SESSION_SECRET
+  ☐ Other secrets
+☐ Verify: python3 -c "from app.database import Base; print('✓')"
+
+FRONTEND SETUP
+══════════════
+☐ cd ~/Maj/frontend
+☐ npm install (wait 2-5 mins)
+☐ Create .env: echo "REACT_APP_API_URL=http://localhost:8000" > .env
+
+CONTRACTS SETUP
+═══════════════
+☐ cd ~/Maj/contracts
+☐ npm install (wait 1-2 mins)
+☐ npx truffle compile (should see "Compiled successfully")
+
+DATABASE SETUP
+══════════════
+OPTION A: Neon (Recommended)
+☐ Create account at https://neon.tech
+☐ Create project: "Voting System"
+☐ Copy connection string
+☐ Update backend/.env DATABASE_URL
+☐ Run schema: psql "YOUR_URL" -f database/schema.sql
+
+OPTION B: Local PostgreSQL
+☐ brew install postgresql@16
+☐ brew services start postgresql@16
+☐ Create database: createdb voting_db
+☐ Create user: psql postgres (run CREATE USER commands)
+☐ Run schema: psql -U voting_user -d voting_db -f database/schema.sql
+☐ Update backend/.env DATABASE_URL
+
+CREATE ADMIN USER
+═════════════════
+☐ cd ~/Maj/backend
+☐ source .venv/bin/activate
+☐ Run create_admin.py script OR
+☐ Insert directly in database SQL
+☐ Note credentials:
+  Username: super_admin
+  Password: Admin@123 (change this!)
+
+START SERVICES (Keep 4 terminals open)
+═══════════════════════════════════════
+
+TERMINAL 1: Ganache
+☐ ganache --networkId 1337 --port 8545
+☐ Should show: "Listening on 127.0.0.1:8545"
+☐ Leave running ✓
+
+TERMINAL 2: Deploy Contracts
+☐ cd ~/Maj/contracts
+☐ npx truffle migrate --network development
+☐ Should show 4 contract addresses
+☐ Then start backend:
+  ☐ cd ~/Maj/backend
+  ☐ source .venv/bin/activate
+  ☐ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+  ☐ Should show: "Application startup complete"
+  ☐ Should show: "contracts_loaded"
+  ☐ Leave running ✓
+
+TERMINAL 3: Frontend
+☐ cd ~/Maj/frontend
+☐ npm start
+☐ Browser opens to http://localhost:3000
+☐ Leave running ✓
+
+TERMINAL 4: Free for commands
+
+VERIFICATION
+════════════
+☐ Test Ganache:
+  curl -X POST http://127.0.0.1:8545 -H "Content-Type: application/json" \
+    --data '{"jsonrpc":"2.0","method":"net_version","params":[],"id":1}'
+  Result should be: {"jsonrpc":"2.0","id":1,"result":"1337"}
+
+☐ Test Backend:
+  curl http://localhost:8000/api/health
+  Result should be: {"status":"healthy"}
+
+☐ Test Frontend:
+  Open: http://localhost:3000
+  Should see: Login page
+
+☐ Test Login:
+  Username: super_admin
+  Password: Admin@123
+  Should see: Admin Dashboard
+
+FUNCTIONAL TESTS
+════════════════
+☐ Navigate to Election Manager
+☐ Create new election
+☐ Add constituency
+☐ Add candidate
+☐ Edit election details (test Edit button)
+☐ Navigate to Voter Registration
+☐ Camera permission works
+☐ Can capture face photo
+☐ Register a test voter
+☐ Check backend logs (no errors)
+☐ Start election
+☐ Go to Polling Booth
+☐ Authenticate with face
+☐ Cast vote
+☐ Close election
+☐ Finalize election
+☐ View results (should show vote count)
+☐ Check Audit Logs
+
+ALL CHECKS PASSED? ✓
+═══════════════════════
+☐ All 4 terminals running without errors
+☐ Can login and use all features
+☐ Votes are being counted correctly
+☐ Blockchain transactions recorded
+☐ No errors in any terminal
+
+✅ SETUP COMPLETE!
+
+═══════════════════════════════════════════════════════════════════
+IMPORTANT FILES FOR YOUR FRIEND:
+═══════════════════════════════════════════════════════════════════
+
+Give them these:
+  ✓ Entire Maj/ folder (except .venv, node_modules, .env)
+  ✓ NEW_MACHINE_SETUP.md (detailed instructions)
+  ✓ SETUP_CHECKLIST.txt (this file)
+  ✓ QUICK_REFERENCE.md (quick commands)
+  ✓ TROUBLESHOOTING_CHECKLIST.md (fix issues)
+
+DO NOT give them:
+  ✗ .env files (contains YOUR secrets)
+  ✗ .venv/ folder (recreate on their machine)
+  ✗ node_modules/ folders (reinstall with npm)
+  ✗ build/ folders (regenerate)
+
+Tell them to:
+  1. Install prerequisites first
+  2. Follow NEW_MACHINE_SETUP.md step by step
+  3. Create their own .env files with new secrets
+  4. Set up their own database (Neon or local)
+  5. Create admin user in their database
+  6. Use this checklist to verify everything
+
+═══════════════════════════════════════════════════════════════════
+ESTIMATED TIME:
+═══════════════════════════════════════════════════════════════════
+  Prerequisites: 30-60 minutes
+  Project Setup: 15-20 minutes
+  Database Setup: 10-15 minutes
+  First Launch: 5-10 minutes
+  ─────────────────────────────
+  TOTAL: 1-2 hours
+═══════════════════════════════════════════════════════════════════
+
+SYSTEM REQUIREMENTS:
+  • RAM: 8GB minimum (16GB recommended)
+  • Disk: 5GB free space
+  • CPU: Any modern processor
+  • OS: macOS, Linux, or Windows (WSL2)
+  • Internet: Required
+
+═══════════════════════════════════════════════════════════════════
+NEED HELP?
+═══════════════════════════════════════════════════════════════════
+  1. Read TROUBLESHOOTING_CHECKLIST.md
+  2. Check terminal logs for errors
+  3. Verify all 4 services are running
+  4. Try restarting from "START SERVICES" section
+  5. Start fresh if needed (nuclear reset option in troubleshooting)
+
+═══════════════════════════════════════════════════════════════════
+SECURITY REMINDERS:
+═══════════════════════════════════════════════════════════════════
+  ☐ Change admin password after first login
+  ☐ Never commit .env files to git
+  ☐ Generate NEW secrets (don't reuse from this machine)
+  ☐ Use different database password
+  ☐ Keep all dependencies updated
+
+═══════════════════════════════════════════════════════════════════
+
+Version: 1.0
+Last Updated: February 16, 2026
+Tested On: macOS, Ubuntu, Windows (WSL2)
