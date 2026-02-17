@@ -1,0 +1,82 @@
+services:
+  - type: web
+    name: blockchain-voting-backend
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: |
+      cd backend
+      pip install --upgrade pip
+      pip install -r requirements.txt
+    startCommand: |
+      cd backend
+      uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      # Database - Add your Neon connection string in Render dashboard
+      - key: DATABASE_URL
+        sync: false
+
+      # Blockchain - Sepolia testnet via Infura
+      - key: GANACHE_URL
+        sync: false  # Add in dashboard: https://sepolia.infura.io/v3/YOUR_INFURA_KEY
+
+      - key: GANACHE_NETWORK_ID
+        value: "11155111"
+
+      # JWT Configuration - Auto-generated secrets
+      - key: JWT_SECRET
+        generateValue: true
+
+      - key: JWT_ALGORITHM
+        value: HS256
+
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "30"
+
+      - key: REFRESH_TOKEN_EXPIRE_DAYS
+        value: "7"
+
+      # Voting Session - Auto-generated
+      - key: VOTING_SESSION_SECRET
+        generateValue: true
+
+      # Biometric - Auto-generated
+      - key: BIOMETRIC_SALT_PEPPER
+        generateValue: true
+
+      - key: BIOMETRIC_ENCRYPTION_KEY
+        generateValue: true
+
+      - key: FACE_MODEL
+        value: ArcFace
+
+      - key: FACE_THRESHOLD
+        value: "0.68"
+
+      - key: FINGERPRINT_SDK
+        value: opencv
+
+      - key: FINGERPRINT_THRESHOLD
+        value: "0.75"
+
+      # Blockchain Pepper - Auto-generated
+      - key: BLOCKCHAIN_PEPPER
+        generateValue: true
+
+      # Security Configuration
+      - key: MAX_AUTH_ATTEMPTS
+        value: "3"
+
+      - key: SESSION_TIMEOUT_SECONDS
+        value: "120"
+
+      - key: LOCKOUT_DURATION_MINUTES
+        value: "30"
+
+      # Logging
+      - key: LOG_LEVEL
+        value: INFO
+
+      - key: LOG_FORMAT
+        value: json

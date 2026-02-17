@@ -1,25 +1,25 @@
 {
   "network": "development",
   "networkId": 1337,
-  "deployer": "0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1",
-  "deployedAt": "2026-02-12T11:25:22.885Z",
+  "deployer": "0x7c12DBcBC34816355411cA210C0fBCdc216A1121",
+  "deployedAt": "2026-02-17T07:07:08.489Z",
   "contracts": {
     "VoterRegistry": {
-      "address": "0xe78A0F7E598Cc8b0Bb87894B0F60dD2a88d6a8Ab",
-      "owner": "0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1"
+      "address": "0x7979f84C7de887DD2982f609790c5c30D9508c7c",
+      "owner": "0x7c12DBcBC34816355411cA210C0fBCdc216A1121"
     },
     "VotingBooth": {
-      "address": "0x5b1869D9A4C187F2EAa108f3062412ecf0526b24",
-      "owner": "0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1",
+      "address": "0x15Ee013ebfa2323536E5a5D4d692b98f1F68b6F8",
+      "owner": "0x7c12DBcBC34816355411cA210C0fBCdc216A1121",
       "electionId": "1"
     },
     "ResultsTallier": {
-      "address": "0xCfEB869F69431e42cdB54A4F4f105C19C080A601",
-      "owner": "0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1"
+      "address": "0x3bDdB72eFBCb219FB6EdDa54cEaBAEAE25A5E523",
+      "owner": "0x7c12DBcBC34816355411cA210C0fBCdc216A1121"
     },
     "ElectionController": {
-      "address": "0x254dffcd3277C0b1660F6d42EFbB754edaBAbC2B",
-      "owner": "0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1",
+      "address": "0x662F8a1827A303e8d6E9c7128d245135c0584420",
+      "owner": "0x7c12DBcBC34816355411cA210C0fBCdc216A1121",
       "electionId": "1",
       "electionName": "General Election 2026"
     }
